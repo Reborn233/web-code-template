@@ -36,7 +36,7 @@ export default {
           { required: true, message: '请选择活动区域', trigger: 'change' }
         ],
         dateRange: [
-          { type: 'array', required: true, message: '请选择日期', trigger: 'change' }
+          { required: true, message: '请选择日期', trigger: 'change' }
         ],
         type: [
           { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
@@ -74,18 +74,17 @@ export default {
           options: () => [
             { label: '区域一', value: 'shanghai' },
             { label: '区域二', value: '北京' }
-          ],
-          change: (value) => {
-            if (value) {
-              this.columns.find(c => c.prop === 'dateRange').hidden = false;
-            }
-          }
+          ]
         },
         {
           label: '活动时间',
-          type: 'dateRange',
+          type: 'time',
           prop: 'dateRange',
-          hidden: true
+          pickerOptions: {
+            start: '08:30',
+            step: '00:15',
+            end: '18:30'
+          }
         },
         {
           label: '即时配送',

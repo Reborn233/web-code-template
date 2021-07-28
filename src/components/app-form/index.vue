@@ -84,6 +84,8 @@ export default {
         text: this.renderTextItem,
         select: this.renderSelectItem,
         dateRange: this.renderDateRangeItem,
+        date: this.renderDateItem,
+        time: this.renderTimeItem,
         switch: this.renderSwitchItem,
         checkbox: this.renderCheckboxItem,
         radio: this.renderRadioItem,
@@ -119,6 +121,22 @@ export default {
         end-placeholder="结束日期"
         value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)}>
       </el-date-picker>;
+    },
+    renderDateItem (column) {
+      return <el-date-picker
+        value={this.form[column.prop]}
+        type="date"
+        onInput={(value) => this.setForm(column.prop, value, column)}
+        placeholder={column.placeholder}>
+      </el-date-picker>
+    },
+    renderTimeItem (column) {
+      return <el-time-select
+        value={this.form[column.prop]}
+        onInput={(value) => this.setForm(column.prop, value, column)}
+        picker-options={column.pickerOptions}
+        placeholder={column.placeholder}>
+      </el-time-select>
     },
     renderSwitchItem (column) {
       return <el-switch value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}></el-switch>;
