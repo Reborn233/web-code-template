@@ -1,0 +1,124 @@
+@import "./variables.scss";
+@import "./element-ui";
+@import "./style.scss";
+
+html,
+body {
+  width: $percent-100;
+  height: $percent-100;
+  // min-width: 1217px;
+  font-family: "PingFangSC Regular";
+  // overflow: hidden;
+}
+
+body,
+div,
+span,
+header,
+footer,
+nav,
+section,
+aside,
+article,
+ul,
+dl,
+dt,
+dd,
+li,
+a,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+i,
+b,
+textarea,
+button,
+input,
+select,
+figure,
+figcaption {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-style: normal;
+  text-decoration: none;
+  border: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  &:hover {
+    outline: none;
+  }
+}
+
+a:focus,
+a:active,
+div {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+input::-ms-clear {
+  display: none;
+}
+input::-ms-reveal {
+  display: none;
+}
+input,
+input[type="button"],
+input[type="submit"],
+input[type="search"],
+input[type="reset"],
+textarea {
+  -webkit-appearance: none;
+}
+
+::-webkit-input-placeholder {
+  columns: #999999;
+}
+.color-danger {
+  color: $color-danger;
+}
+.color-success {
+  color: $color-success;
+}
+.color-warning {
+  color: $color-warning;
+}
+.color-info {
+  color: $color-info;
+}
+.bg-danger {
+  background-color: $color-danger;
+}
+.bg-success {
+  background-color: $color-success;
+}
+.bg-warning {
+  background-color: $color-warning;
+}
+.bg-info {
+  background-color: $color-info;
+}
+.red {
+  color: red;
+}
+.blue {
+  color: $primary-color;
+}
+
+.container {
+  background-color: #fff;
+  padding: 12px;
+  margin-bottom: 15px;
+}
