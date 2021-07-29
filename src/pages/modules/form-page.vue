@@ -2,7 +2,7 @@
   <div class="container">
     <app-section title="表单组件">
       <app-form ref="form"
-                label-width="80px"
+                label-width="100px"
                 :rules='rules'
                 style="width: 750px;"
                 :columns='columns'></app-form>
@@ -30,7 +30,7 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
         ],
         region: [
           { required: true, message: '请选择活动区域', trigger: 'change' }
@@ -66,15 +66,19 @@ export default {
           prop: 'name',
           placeholder: '请输入活动名称',
           default: '默认活动名称',
+          disabled: true,
           col: 12
         },
         {
           label: '活动区域',
           type: 'select',
           prop: 'region',
+          placeholder: '请选择活动区域',
+          disabled: true,
+          default: 'beijing',
           options: () => [
             { label: '区域一', value: 'shanghai' },
-            { label: '区域二', value: '北京' }
+            { label: '区域二', value: 'beijing' }
           ],
           col: 12
         },
@@ -86,13 +90,15 @@ export default {
             start: '08:30',
             step: '00:15',
             end: '18:30'
-          }
+          },
+          disabled: true
         },
         {
           label: '即时配送',
           type: 'switch',
           prop: 'delivery',
-          default: true
+          default: true,
+          disabled: true
         },
         {
           label: '活动性质',
@@ -103,7 +109,8 @@ export default {
             { label: '地推活动', value: 2 },
             { label: '线下主题活动', value: 3 },
             { label: '单纯品牌', value: 4 }
-          ]
+          ],
+          disabled: true
         },
         {
           label: '特殊资源',
@@ -112,12 +119,23 @@ export default {
           options: [
             { label: '线上品牌商赞助', value: 1 },
             { label: '线下场地免费', value: 2 }
-          ]
+          ],
+          disabled: true
         },
         {
           label: '活动形式',
           prop: 'desc',
-          type: 'textarea'
+          type: 'textarea',
+          disabled: true
+        },
+        {
+          label: '上传文件',
+          prop: 'upload',
+          type: 'upload',
+          accept: '.jpg',
+          change: (file) => {
+            // console.log('file:', file);
+          }
         }
       ];
     },

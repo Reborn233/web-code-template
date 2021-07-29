@@ -91,7 +91,8 @@ export default {
         switch: this.renderSwitchItem,
         checkbox: this.renderCheckboxItem,
         radio: this.renderRadioItem,
-        textarea: this.renderTextareaItem
+        textarea: this.renderTextareaItem,
+        upload: this.renderUploadItem
       };
       const assginColumn = Object.assign({}, this.defaultColumn, column);
       const prop = {
@@ -99,74 +100,107 @@ export default {
           ...assginColumn
         }
       };
-      return <el-col span={column.col}>
-        <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
-          {map[assginColumn.type](assginColumn)}
-        </el-form-item>
-      </el-col>;
+      if (column.render) {
+        return <el-col span={column.col}>
+          <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
+            {column.render()}
+          </el-form-item>
+        </el-col>;
+      }
+      else {
+        return <el-col span={column.col}>
+          <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
+            {map[assginColumn.type](assginColumn, prop)}
+          </el-form-item>
+        </el-col>;
+      }
     },
-    renderTextItem (column) {
-      return <el-input value={this.form[column.prop]} placeholder={column.placeholder} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
+    renderTextItem (column, props) {
+      return <el-input value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
     },
-    renderSelectItem (column) {
+    renderSelectItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-select value={this.form[column.prop]} placeholder={column.placeholder} onInput={(value) => this.setForm(column.prop, value, column)}>
+      return <el-select value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
         {options.map(o => {
           return <el-option label={o.label} value={o.value}></el-option>;
         })}
       </el-select>;
     },
-    renderDateRangeItem (column) {
+    renderDateRangeItem (column, props) {
       return <el-date-picker
         value={this.form[column.prop]}
         default-time={['00:00:00', '23:59:59']}
         type="daterange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
+        {...props}
         value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)}>
       </el-date-picker>;
     },
-    renderDateItem (column) {
+    renderDateItem (column, props) {
       return <el-date-picker
         value={this.form[column.prop]}
         type="date"
-        onInput={(value) => this.setForm(column.prop, value, column)}
-        placeholder={column.placeholder}>
+        {...props}
+        onInput={(value) => this.setForm(column.prop, value, column)}>
       </el-date-picker>;
     },
-    renderTimeItem (column) {
+    renderTimeItem (column, props) {
       return <el-time-select
         value={this.form[column.prop]}
         onInput={(value) => this.setForm(column.prop, value, column)}
-        picker-options={column.pickerOptions}
-        placeholder={column.placeholder}>
+        {...props}
+        picker-options={column.pickerOptions}>
       </el-time-select>;
     },
-    renderSwitchItem (column) {
-      return <el-switch value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}></el-switch>;
+    renderSwitchItem (column, props) {
+      return <el-switch value={this.form[column.prop]}
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-switch>;
     },
-    renderCheckboxItem (column) {
+    renderCheckboxItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-checkbox-group value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}>
+      return <el-checkbox-group value={this.form[column.prop]}
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
         {options.map(o => {
           return <el-checkbox label={o.value} disabled={o.disabled} name={o.label}>{o.label}</el-checkbox>;
         })}
       </el-checkbox-group>;
     },
-    renderRadioItem (column) {
+    renderRadioItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-radio-group value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}>
+      return <el-radio-group value={this.form[column.prop]}
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
         {options.map(o => {
           return <el-radio label={o.value} disabled={o.disabled}>{o.label}</el-radio>;
         })}
       </el-radio-group>;
     },
-    renderTextareaItem (column) {
-      return <el-input type="textarea" value={this.form[column.prop]} placeholder={column.placeholder} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
+    renderTextareaItem (column, props) {
+      return <el-input type="textarea" value={this.form[column.prop]}
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
+    },
+    renderUploadItem (column) {
+      const prop = {
+        on: {
+          selected: (file) => {
+            this.setForm(column.prop, file, column);
+          }
+        }
+      };
+      return <div class='app-form__upload'>
+        <file-button accept={column.accept} {...prop} disabled={column.disabled}>选择文件</file-button>
+        {this.form[column.prop] ? <div class='el-upload-list__item-name'>
+          <i class='el-icon-document'></i>
+          {this.form[column.prop].name}
+        </div> : ''}
+      </div>;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.app-form__upload {
+  display: flex;
+}
 </style>

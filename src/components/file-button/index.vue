@@ -2,6 +2,7 @@
   <div class="file-button">
     <el-button type="primary"
                :size="size"
+               :disabled='disabled'
                @click="clickBtn">
       <slot></slot>
     </el-button>
@@ -31,7 +32,8 @@ export default {
     size: {
       type: String,
       default: 'mini'
-    }
+    },
+    disabled: Boolean
   },
 
   data () {
