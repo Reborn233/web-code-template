@@ -14,7 +14,8 @@ export default {
       defaultColumn: {
         placeholder: '请输入...',
         options: [],
-        type: 'text'
+        type: 'text',
+        col: 24
       }
     };
   },
@@ -32,10 +33,11 @@ export default {
       },
       on: { ...this.$listeners }
     };
-    return <el-form ref={'appForm'} {...props}>
-      {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
-      <pre>{JSON.stringify(this.form, null, 2)}</pre>
-    </el-form>;
+    return <el-row gutter={20}>
+      <el-form ref={'appForm'} {...props}>
+        {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
+      </el-form>
+    </el-row>;
   },
   created () {
     this.init();
@@ -97,9 +99,11 @@ export default {
           ...assginColumn
         }
       };
-      return <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
-        {map[assginColumn.type](assginColumn)}
-      </el-form-item>;
+      return <el-col span={column.col}>
+        <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
+          {map[assginColumn.type](assginColumn)}
+        </el-form-item>
+      </el-col>;
     },
     renderTextItem (column) {
       return <el-input value={this.form[column.prop]} placeholder={column.placeholder} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
@@ -128,7 +132,7 @@ export default {
         type="date"
         onInput={(value) => this.setForm(column.prop, value, column)}
         placeholder={column.placeholder}>
-      </el-date-picker>
+      </el-date-picker>;
     },
     renderTimeItem (column) {
       return <el-time-select
@@ -136,7 +140,7 @@ export default {
         onInput={(value) => this.setForm(column.prop, value, column)}
         picker-options={column.pickerOptions}
         placeholder={column.placeholder}>
-      </el-time-select>
+      </el-time-select>;
     },
     renderSwitchItem (column) {
       return <el-switch value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}></el-switch>;

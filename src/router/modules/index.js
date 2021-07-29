@@ -30,5 +30,15 @@ export default [
       menuMapper: 'formPage',
       breadcrumb: 'formPage'
     }
+  },
+  {
+    path: 'panel',
+    name: 'panelPage',
+    component: _import('modules/panel-page'),
+    meta: {
+      permission: 'ANY',
+      menuMapper: 'panelPage',
+      breadcrumb: 'panelPage'
+    }
   }
 ];

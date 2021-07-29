@@ -22,5 +22,11 @@ export default [
     desc: '表单组件',
     permission: 'ANY',
     iconClass: 'el-icon-s-grid'
+  },
+  {
+    name: 'panelPage',
+    desc: '弹窗组件',
+    permission: 'ANY',
+    iconClass: 'el-icon-s-grid'
   }
 ];

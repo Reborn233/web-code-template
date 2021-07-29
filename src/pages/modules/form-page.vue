@@ -4,7 +4,7 @@
       <app-form ref="form"
                 label-width="80px"
                 :rules='rules'
-                style="width: 500px;"
+                style="width: 750px;"
                 :columns='columns'></app-form>
       <el-button type="primary"
                  @click="sumbit">提交</el-button>
@@ -65,7 +65,8 @@ export default {
           type: 'text',
           prop: 'name',
           placeholder: '请输入活动名称',
-          default: '默认活动名称'
+          default: '默认活动名称',
+          col: 12
         },
         {
           label: '活动区域',
@@ -74,7 +75,8 @@ export default {
           options: () => [
             { label: '区域一', value: 'shanghai' },
             { label: '区域二', value: '北京' }
-          ]
+          ],
+          col: 12
         },
         {
           label: '活动时间',
