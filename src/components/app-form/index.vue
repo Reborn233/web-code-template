@@ -42,9 +42,6 @@ export default {
       <el-form ref={'appForm'} {...props}>
         {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
       </el-form>
-      <el-col span={24}>
-        <pre>{JSON.stringify(this.form, null, 2)}</pre>
-      </el-col>
     </el-row>;
   },
   created () {
