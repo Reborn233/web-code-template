@@ -1,6 +1,8 @@
 <script>
 import { Util } from '../../utils/common';
 
+const noop = () => { };
+
 export default {
   name: 'appForm',
 
@@ -15,7 +17,10 @@ export default {
         placeholder: '请输入...',
         options: [],
         type: 'text',
-        col: 24
+        col: 24,
+        size: 'mini',
+        min: 1,
+        max: 10
       }
     };
   },
@@ -37,6 +42,9 @@ export default {
       <el-form ref={'appForm'} {...props}>
         {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
       </el-form>
+      <el-col span={24}>
+        <pre>{JSON.stringify(this.form, null, 2)}</pre>
+      </el-col>
     </el-row>;
   },
   created () {
@@ -47,19 +55,24 @@ export default {
     init () {
       this.columns.forEach(column => {
         const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
-        switch (column.type) {
-          case 'checkbox':
+        const valueIsArray = ['checkbox', 'cascader', 'dateRange'];
+        const valueIsNumber = ['slider', 'rate', 'dateRange'];
+        if (valueIsArray.includes(column.type)) {
+          this.setForm(column.prop, defaultValue || []);
+        }
+        else if (column.type === 'switch') {
+          this.setForm(column.prop, defaultValue || false);
+        }
+        else if (valueIsNumber.includes(column.type)) {
+          if (column.range) {
             this.setForm(column.prop, defaultValue || []);
-            break;
-          case 'dateRange':
-            this.setForm(column.prop, defaultValue || []);
-            break;
-          case 'switch':
-            this.setForm(column.prop, defaultValue || false);
-            break;
-          default:
-            this.setForm(column.prop, defaultValue || '');
-            break;
+          }
+          else {
+            this.setForm(column.prop, defaultValue || 0);
+          }
+        }
+        else {
+          this.setForm(column.prop, defaultValue || '');
         }
       });
     },
@@ -92,7 +105,11 @@ export default {
         checkbox: this.renderCheckboxItem,
         radio: this.renderRadioItem,
         textarea: this.renderTextareaItem,
-        upload: this.renderUploadItem
+        upload: this.renderUploadItem,
+        inputNumber: this.renderInputNumberItem,
+        cascader: this.renderCascaderItem,
+        slider: this.renderSliderItem,
+        rate: this.renderRateItem
       };
       const assginColumn = Object.assign({}, this.defaultColumn, column);
       const prop = {
@@ -108,9 +125,10 @@ export default {
         </el-col>;
       }
       else {
+        const render = map[assginColumn.type] || noop;
         return <el-col span={column.col}>
           <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
-            {map[assginColumn.type](assginColumn, prop)}
+            {render(assginColumn, prop)}
           </el-form-item>
         </el-col>;
       }
@@ -194,6 +212,28 @@ export default {
           {this.form[column.prop].name}
         </div> : ''}
       </div>;
+    },
+    renderInputNumberItem (column, props) {
+      return <el-input-number value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input-number>;
+    },
+    renderCascaderItem (column, props) {
+      const scopedSlots = {
+        default: (scope) => {
+          return column.slot(scope);
+        }
+      };
+      return <el-cascader
+        value={this.form[column.prop]}
+        onInput={(value) => this.setForm(column.prop, value, column)}
+        {...props} scopedSlots={scopedSlots}></el-cascader>;
+    },
+    renderSliderItem (column, props) {
+      return <el-slider value={this.form[column.prop]}
+        onInput={(value) => this.setForm(column.prop, value, column)} {...props}></el-slider>;
+    },
+    renderRateItem (column, props) {
+      return <el-rate value={this.form[column.prop]}
+        onInput={(value) => this.setForm(column.prop, value, column)} {...props}></el-rate>;
     }
   }
 };

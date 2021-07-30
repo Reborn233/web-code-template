@@ -22,7 +22,6 @@
           prop: 'name',
           placeholder: '请输入活动名称',
           default: '默认活动名称',
-          disabled: true,
           col: 12
         },
         {
@@ -30,7 +29,6 @@
           type: 'select',
           prop: 'region',
           placeholder: '请选择活动区域',
-          disabled: true,
           default: 'beijing',
           options: () => [
             { label: '区域一', value: 'shanghai' },
@@ -46,15 +44,13 @@
             start: '08:30',
             step: '00:15',
             end: '18:30'
-          },
-          disabled: true
+          }
         },
         {
           label: '即时配送',
           type: 'switch',
           prop: 'delivery',
-          default: true,
-          disabled: true
+          default: true
         },
         {
           label: '活动性质',
@@ -65,8 +61,7 @@
             { label: '地推活动', value: 2 },
             { label: '线下主题活动', value: 3 },
             { label: '单纯品牌', value: 4 }
-          ],
-          disabled: true
+          ]
         },
         {
           label: '特殊资源',
@@ -75,14 +70,12 @@
           options: [
             { label: '线上品牌商赞助', value: 1 },
             { label: '线下场地免费', value: 2 }
-          ],
-          disabled: true
+          ]
         },
         {
           label: '活动形式',
           prop: 'desc',
-          type: 'textarea',
-          disabled: true
+          type: 'textarea'
         },
         {
           label: '上传文件',
@@ -92,6 +85,44 @@
           change: (file) => {
             // console.log('file:', file);
           }
+        },
+        {
+          label: '计数器',
+          prop: 'inputNumber',
+          type: 'inputNumber',
+          step: 2
+        },
+        {
+          label: '级联选择器',
+          prop: 'cascader',
+          type: 'cascader',
+          options: cascaderOptions,
+          clearable: true,
+          props: { checkStrictly: true },
+          slot: ({ node, data }) => {
+            return <div>
+              <span>{data.label}</span>
+              {!node.isLeaf ? <span>({data.children.length})</span> : ''}
+            </div>;
+          }
+        },
+        {
+          label: '滑块',
+          prop: 'slider',
+          type: 'slider',
+          default: [3, 5],
+          showStops: true,
+          range: true
+        },
+        {
+          label: '评分',
+          prop: 'rate',
+          type: 'rate',
+          default: 5.5,
+          colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+          disabled: true,
+          showScore: true,
+          textColor: '#ff9900'
         }
       ]
 ```
