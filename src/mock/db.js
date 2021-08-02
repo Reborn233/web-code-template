@@ -17,3 +17,22 @@ export const USER = {
   accountId: 2313,
   isAdmin: 1
 };
+
+
+export const TODOS = [
+  {
+    id: 1,
+    label: 'Vue',
+    finished: false
+  },
+  {
+    id: 2,
+    label: 'Javascript',
+    finished: false
+  },
+  {
+    id: 3,
+    label: 'Python',
+    finished: false
+  }
+]

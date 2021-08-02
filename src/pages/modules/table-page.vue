@@ -96,15 +96,18 @@ export default {
         },
         {
           label: '日期',
-          prop: 'date'
+          prop: 'date',
+          sortable: true
         },
         {
           label: '姓名',
-          prop: 'name'
+          prop: 'name',
+          sortable: true
         },
         {
           label: '地址',
-          prop: 'address'
+          prop: 'address',
+          sortable: true
         }
       ];
     },

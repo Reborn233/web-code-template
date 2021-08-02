@@ -40,5 +40,15 @@ export default [
       menuMapper: 'panelPage',
       breadcrumb: 'panelPage'
     }
+  },
+  {
+    path: 'todo',
+    name: 'todo',
+    component: _import('modules/todo/index'),
+    meta: {
+      permission: 'ANY',
+      menuMapper: 'todo',
+      breadcrumb: 'todo'
+    }
   }
 ];

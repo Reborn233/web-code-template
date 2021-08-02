@@ -28,5 +28,11 @@ export default [
     desc: '弹窗组件',
     permission: 'ANY',
     iconClass: 'el-icon-s-grid'
+  },
+  {
+    name: 'todo',
+    desc: 'todo',
+    permission: 'ANY',
+    iconClass: 'el-icon-s-grid'
   }
 ];

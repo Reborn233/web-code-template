@@ -1,5 +1,6 @@
 import Mock from 'mockjs';
 import {
+  TODOS,
   USER
 } from './db';
 Mock.setup({
@@ -25,5 +26,12 @@ Mock.mock(/autocloud\/sms\/merchantuser\/logininfo\/get/, 'get', {
   code: '000000',
   message: 'success',
   content: USER,
+  succeeded: true
+});
+
+Mock.mock(/api\/todos/, 'get', {
+  code: '000000',
+  message: 'success',
+  content: TODOS,
   succeeded: true
 });

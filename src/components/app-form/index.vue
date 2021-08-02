@@ -42,6 +42,7 @@ export default {
       <el-form ref={'appForm'} {...props}>
         {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
       </el-form>
+      {this.$scopedSlots.action && this.$scopedSlots.action()}
     </el-row>;
   },
   created () {
