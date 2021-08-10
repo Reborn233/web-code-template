@@ -195,7 +195,8 @@ export default {
     renderActions () {
       return <el-row type="flex" justify='space-between' class='app-table_actions'>
         <div>{this.actions.map(action => {
-          return <el-button type="text" icon={action.icon} onClick={action.onClick}>{action.label}</el-button>;
+          const onClick = action.onClick || Util.noop;
+          return <el-button type="text" icon={action.icon} onClick={onClick}>{action.label}</el-button>;
         })}</div>
         {this.isColumnFilter ? this.renderFilter() : ''}
       </el-row>;

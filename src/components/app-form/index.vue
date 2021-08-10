@@ -38,11 +38,15 @@ export default {
       },
       on: { ...this.$listeners }
     };
-    return <el-row gutter={20}>
+    return <el-row {...props}>
       <el-form ref={'appForm'} {...props}>
         {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
+        <el-col span={24}>
+          <el-form-item>
+            {this.$scopedSlots.action && this.$scopedSlots.action()}
+          </el-form-item>
+        </el-col>
       </el-form>
-      {this.$scopedSlots.action && this.$scopedSlots.action()}
     </el-row>;
   },
   created () {
@@ -144,20 +148,20 @@ export default {
     },
     renderDateRangeItem (column, props) {
       return <el-date-picker
+        {...props}
         value={this.form[column.prop]}
         default-time={['00:00:00', '23:59:59']}
         type="daterange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        {...props}
         value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)}>
       </el-date-picker>;
     },
     renderDateItem (column, props) {
       return <el-date-picker
+        {...props}
         value={this.form[column.prop]}
         type="date"
-        {...props}
         onInput={(value) => this.setForm(column.prop, value, column)}>
       </el-date-picker>;
     },
@@ -240,5 +244,9 @@ export default {
 <style lang="scss" scoped>
 .app-form__upload {
   display: flex;
+}
+/deep/ .el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+  width: 100%;
 }
 </style>
