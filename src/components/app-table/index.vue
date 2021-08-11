@@ -76,6 +76,9 @@ export default {
         this.newColumns = this.originColumns;
       }
       // this.$forceUpdate();
+    },
+    columns (val) {
+      this.newColumns = Util.deepClone(val);
     }
   },
   created () {

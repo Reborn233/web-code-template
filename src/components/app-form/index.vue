@@ -58,7 +58,7 @@ export default {
       this.columns.forEach(column => {
         const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
         const valueIsArray = ['checkbox', 'cascader', 'dateRange'];
-        const valueIsNumber = ['slider', 'rate', 'dateRange'];
+        const valueIsNumber = ['slider', 'rate'];
         if (valueIsArray.includes(column.type)) {
           this.setForm(column.prop, defaultValue || []);
         }
@@ -99,6 +99,7 @@ export default {
     renderFormItem (column) {
       const map = {
         text: this.renderTextItem,
+        password: this.renderTextItem,
         select: this.renderSelectItem,
         dateRange: this.renderDateRangeItem,
         date: this.renderDateItem,
@@ -119,9 +120,13 @@ export default {
           ...assginColumn
         }
       };
+      const formItemProp = {
+        labelWidth: prop.labelWidth,
+        rules: prop.rules
+      }
       if (column.render) {
         return <el-col span={column.col}>
-          <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
+          <el-form-item {...formItemProp} label={assginColumn.label} prop={assginColumn.prop}>
             {column.render()}
           </el-form-item>
         </el-col>;
@@ -129,18 +134,23 @@ export default {
       else {
         const render = map[assginColumn.type] || noop;
         return <el-col span={column.col}>
-          <el-form-item {...prop} label={assginColumn.label} prop={assginColumn.prop}>
+          <el-form-item {...formItemProp} label={assginColumn.label} prop={assginColumn.prop}>
             {render(assginColumn, prop)}
           </el-form-item>
         </el-col>;
       }
     },
     renderTextItem (column, props) {
-      return <el-input value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
+      const onClickRight = column.onClickRight || Util.noop;
+      return <el-input value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+        <template slot="suffix">
+          <i class={`el-input__icon ${column.rightIcon} cursor-pointer`} onClick={onClickRight}></i>
+        </template>
+      </el-input>;
     },
     renderSelectItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-select value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
+      return <el-select value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
         {options.map(o => {
           return <el-option label={o.label} value={o.value}></el-option>;
         })}
@@ -154,7 +164,7 @@ export default {
         type="daterange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)}>
+        value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
       </el-date-picker>;
     },
     renderDateItem (column, props) {
@@ -162,7 +172,7 @@ export default {
         {...props}
         value={this.form[column.prop]}
         type="date"
-        onInput={(value) => this.setForm(column.prop, value, column)}>
+        onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
       </el-date-picker>;
     },
     renderTimeItem (column, props) {
@@ -170,17 +180,17 @@ export default {
         value={this.form[column.prop]}
         onInput={(value) => this.setForm(column.prop, value, column)}
         {...props}
-        picker-options={column.pickerOptions}>
+        picker-options={column.pickerOptions} style={column.style}>
       </el-time-select>;
     },
     renderSwitchItem (column, props) {
       return <el-switch value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-switch>;
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-switch>;
     },
     renderCheckboxItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
       return <el-checkbox-group value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
         {options.map(o => {
           return <el-checkbox label={o.value} disabled={o.disabled} name={o.label}>{o.label}</el-checkbox>;
         })}
@@ -189,7 +199,7 @@ export default {
     renderRadioItem (column, props) {
       const options = Util.isFunction(column.options) ? column.options() : column.options;
       return <el-radio-group value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)}>
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
         {options.map(o => {
           return <el-radio label={o.value} disabled={o.disabled}>{o.label}</el-radio>;
         })}
@@ -197,7 +207,7 @@ export default {
     },
     renderTextareaItem (column, props) {
       return <el-input type="textarea" value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input>;
+        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input>;
     },
     renderUploadItem (column) {
       const prop = {
@@ -207,7 +217,7 @@ export default {
           }
         }
       };
-      return <div class='app-form__upload'>
+      return <div class='app-form__upload' style={column.style}>
         <file-button accept={column.accept} {...prop} disabled={column.disabled}>选择文件</file-button>
         {this.form[column.prop] ? <div class='el-upload-list__item-name'>
           <i class='el-icon-document'></i>
@@ -216,7 +226,7 @@ export default {
       </div>;
     },
     renderInputNumberItem (column, props) {
-      return <el-input-number value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)}></el-input-number>;
+      return <el-input-number value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input-number>;
     },
     renderCascaderItem (column, props) {
       const scopedSlots = {
@@ -227,15 +237,15 @@ export default {
       return <el-cascader
         value={this.form[column.prop]}
         onInput={(value) => this.setForm(column.prop, value, column)}
-        {...props} scopedSlots={scopedSlots}></el-cascader>;
+        {...props} scopedSlots={scopedSlots} style={column.style}></el-cascader>;
     },
     renderSliderItem (column, props) {
       return <el-slider value={this.form[column.prop]}
-        onInput={(value) => this.setForm(column.prop, value, column)} {...props}></el-slider>;
+        onInput={(value) => this.setForm(column.prop, value, column)} {...props} style={column.style}></el-slider>;
     },
     renderRateItem (column, props) {
       return <el-rate value={this.form[column.prop]}
-        onInput={(value) => this.setForm(column.prop, value, column)} {...props}></el-rate>;
+        onInput={(value) => this.setForm(column.prop, value, column)} {...props} style={column.style}></el-rate>;
     }
   }
 };
