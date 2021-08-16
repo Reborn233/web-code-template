@@ -134,7 +134,7 @@ export default {
           }
         };
       };
-      const columns = this.isColumnFilter ? this.newColumns.filter(f => !f.hidden) : this.newColumns;
+      const columns = this.newColumns.filter(f => !f.hidden);
       return columns.map(item => {
         const data = {
           props: {
@@ -197,10 +197,13 @@ export default {
     },
     renderActions () {
       return <el-row type="flex" justify='space-between' class='app-table_actions'>
-        <div>{this.actions.map(action => {
-          const onClick = action.onClick || Util.noop;
-          return <el-button type="text" icon={action.icon} onClick={onClick}>{action.label}</el-button>;
-        })}</div>
+        <el-row type="flex">
+          {this.actions.map(action => {
+            const onClick = action.onClick || Util.noop;
+            return <el-button type="text" icon={action.icon} onClick={onClick}>{action.label}</el-button>;
+          })}
+          {this.$scopedSlots.head && this.$scopedSlots.head()}
+        </el-row>
         {this.isColumnFilter ? this.renderFilter() : ''}
       </el-row>;
     }

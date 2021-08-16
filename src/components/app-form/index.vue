@@ -7,7 +7,15 @@ export default {
   name: 'appForm',
 
   props: {
-    columns: Array
+    columns: Array,
+    data: Object
+  },
+  watch: {
+    data (val) {
+      if (val) {
+        this.form = Object.assign({}, val);
+      }
+    }
   },
 
   data () {
@@ -63,7 +71,7 @@ export default {
           this.setForm(column.prop, defaultValue || []);
         }
         else if (column.type === 'switch') {
-          this.setForm(column.prop, defaultValue || false);
+          this.setForm(column.prop, defaultValue);
         }
         else if (valueIsNumber.includes(column.type)) {
           if (column.range) {
@@ -117,13 +125,14 @@ export default {
       const assginColumn = Object.assign({}, this.defaultColumn, column);
       const prop = {
         attrs: {
-          ...assginColumn
+          ...assginColumn,
+          disabled: Util.isFunction(assginColumn.disabled) ? assginColumn.disabled() : assginColumn.disabled
         }
       };
       const formItemProp = {
         labelWidth: prop.labelWidth,
         rules: prop.rules
-      }
+      };
       if (column.render) {
         return <el-col span={column.col}>
           <el-form-item {...formItemProp} label={assginColumn.label} prop={assginColumn.prop}>

@@ -1,9 +1,12 @@
 <template>
   <el-dialog :visible.sync="show"
              v-bind="$attrs"
+             top="30px"
              :show-close='false'
              :fullscreen='fullscreen'
-             v-on="$listeners">
+             v-on="$listeners"
+             :close-on-click-modal='false'
+             :before-close='onClose'>
     <template #title>
       <div class="el-dialog__title">{{title}}</div>
       <button type="button"
@@ -17,16 +20,17 @@
         <i class="el-icon el-icon-close"></i>
       </button>
     </template>
-    <div>
+    <div v-loading='loading'>
       <slot></slot>
+      <div class="footer">
+        <el-button v-for="(item,index) in options"
+                   :key="index"
+                   :type="item.type"
+                   :icon="item.icon"
+                   @click="item.onClick">{{item.text}}</el-button>
+        <slot name="footer"></slot>
+      </div>
     </div>
-    <span slot="footer">
-      <el-button v-for="(item,index) in options"
-                 :key="index"
-                 :type="item.type"
-                 :icon="item.icon"
-                 @click="item.onClick">{{item.text}}</el-button>
-    </span>
   </el-dialog>
 </template>
 
@@ -46,7 +50,8 @@ export default {
       default () {
         return [];
       }
-    }
+    },
+    loading: Boolean
   },
 
   data () {
@@ -69,5 +74,17 @@ export default {
 <style lang="scss" scoped>
 .el-dialog__fullscreen {
   right: 45px;
+}
+/deep/ .el-dialog__headerbtn {
+  color: #fff;
+  > i {
+    font-weight: 700;
+  }
+}
+.footer {
+  border-top: 1px solid #eee;
+  padding: 10px 20px 0 20px;
+  text-align: right;
+  box-sizing: border-box;
 }
 </style>
