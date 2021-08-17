@@ -63,6 +63,7 @@ export default {
   methods: {
     onClose () {
       this.$emit('update:show', false);
+      this.fullscreen = false;
     },
     onFullscreen () {
       this.fullscreen = !this.fullscreen;

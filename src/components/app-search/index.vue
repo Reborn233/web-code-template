@@ -25,6 +25,7 @@
         <el-select v-else-if="column.type === 'select'"
                    v-model="queryParams[column.prop]"
                    :placeholder="column.placeholder || '请选择'"
+                   :clearable='column.clearable'
                    :style="column.style">
           <el-option v-for="item in returnOptions(column.options)"
                      :key="item.value"
