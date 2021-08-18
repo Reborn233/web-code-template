@@ -6,7 +6,8 @@
              :fullscreen='fullscreen'
              v-on="$listeners"
              :close-on-click-modal='false'
-             :before-close='onClose'>
+             :before-close='onClose'
+             @closed='onClosed'>
     <template #title>
       <div class="el-dialog__title">{{title}}</div>
       <button type="button"
@@ -63,6 +64,8 @@ export default {
   methods: {
     onClose () {
       this.$emit('update:show', false);
+    },
+    onClosed () {
       this.fullscreen = false;
     },
     onFullscreen () {
