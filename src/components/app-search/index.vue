@@ -13,6 +13,7 @@
                         start-placeholder="开始日期"
                         end-placeholder="结束日期"
                         value-format="timestamp"
+                        :disabled='column.disabled'
                         :style="column.style">
         </el-date-picker>
         <el-date-picker v-else-if="column.type === 'date'"
@@ -20,12 +21,14 @@
                         type="date"
                         :placeholder="column.placeholder || '请选择日期'"
                         value-format="timestamp"
+                        :disabled='column.disabled'
                         :style="column.style">
         </el-date-picker>
         <el-select v-else-if="column.type === 'select'"
                    v-model="queryParams[column.prop]"
                    :placeholder="column.placeholder || '请选择'"
                    :clearable='column.clearable'
+                   :disabled='column.disabled'
                    :style="column.style">
           <el-option v-for="item in returnOptions(column.options)"
                      :key="item.value"
@@ -34,6 +37,7 @@
         </el-select>
         <el-input v-else
                   v-model="queryParams[column.prop]"
+                  :disabled='column.disabled'
                   :placeholder="column.placeholder || '请输入'"
                   :style="column.style"></el-input>
       </el-form-item>
@@ -140,7 +144,7 @@ export default {
     },
     getParams () {
       let moreParams = {};
-      if (this.moreOptions.length) {
+      if (this.$refs.appForm) {
         moreParams = this.$refs.appForm.getParams();
       }
       const params = {

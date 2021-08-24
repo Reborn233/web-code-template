@@ -11,10 +11,13 @@ export default {
     data: Object
   },
   watch: {
-    data (val) {
-      if (val) {
-        this.form = Object.assign({}, val);
-      }
+    data: {
+      handler (val) {
+        if (val) {
+          this.form = Object.assign({}, val);
+        }
+      },
+      immediate: true
     }
   },
 
@@ -58,33 +61,40 @@ export default {
     </el-row>;
   },
   created () {
-    this.init();
+    if (this.isEmptyObject(this.data)) {
+      this.init();
+    }
   },
 
   methods: {
     init () {
       this.columns.forEach(column => {
-        const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
-        const valueIsArray = ['checkbox', 'cascader', 'dateRange'];
-        const valueIsNumber = ['slider', 'rate'];
-        if (valueIsArray.includes(column.type)) {
-          this.setForm(column.prop, defaultValue || []);
-        }
-        else if (column.type === 'switch') {
-          this.setForm(column.prop, defaultValue);
-        }
-        else if (valueIsNumber.includes(column.type)) {
-          if (column.range) {
+        if (column.prop) {
+          const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
+          const valueIsArray = ['checkbox', 'cascader', 'dateRange'];
+          const valueIsNumber = ['slider', 'rate'];
+          if (valueIsArray.includes(column.type)) {
             this.setForm(column.prop, defaultValue || []);
           }
+          else if (column.type === 'switch') {
+            this.setForm(column.prop, defaultValue);
+          }
+          else if (valueIsNumber.includes(column.type)) {
+            if (column.range) {
+              this.setForm(column.prop, defaultValue || []);
+            }
+            else {
+              this.setForm(column.prop, defaultValue || 0);
+            }
+          }
           else {
-            this.setForm(column.prop, defaultValue || 0);
+            this.setForm(column.prop, defaultValue || '');
           }
         }
-        else {
-          this.setForm(column.prop, defaultValue || '');
-        }
       });
+    },
+    isEmptyObject (obj) {
+      return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
     },
     setForm (key, value, column) {
       this.$set(this.form, key, value);
@@ -107,6 +117,7 @@ export default {
     renderFormItem (column) {
       const map = {
         text: this.renderTextItem,
+        number: this.renderTextItem,
         password: this.renderTextItem,
         select: this.renderSelectItem,
         dateRange: this.renderDateRangeItem,
