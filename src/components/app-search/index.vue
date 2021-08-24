@@ -45,7 +45,8 @@
         <el-button type="primary"
                    icon="el-icon-search"
                    @click="clickSearch">查询</el-button>
-        <el-button type="text"
+        <el-button v-if="!hasMore"
+                   type="text"
                    icon="el-icon-delete"
                    @click="resetForm">清空查询</el-button>
         <el-button v-if="moreOptions.length"
@@ -104,6 +105,9 @@
             <el-button type='primary'
                        icon="el-icon-search"
                        @click="clickSearch">查询</el-button>
+            <el-button v-if="hasMore"
+                       icon="el-icon-delete"
+                       @click="resetForm">重置</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -139,6 +143,9 @@ export default {
     },
     moreOptions () {
       return this.options.more || [];
+    },
+    hasMore () {
+      return this.moreOptions.length > 0;
     }
   },
   watch: {
@@ -191,7 +198,9 @@ export default {
     },
     resetForm () {
       this.$refs.form.resetFields();
-      this.$refs.moreForm.resetFields();
+      if (this.hasMore) {
+        this.$refs.moreForm.resetFields();
+      }
     },
     getParams () {
       const params = {
