@@ -54,23 +54,59 @@
                    @click="drawerShow = true">更多筛选</el-button>
       </el-form-item>
     </el-form>
-    <el-drawer v-if="moreOptions.length"
-               title="更多过滤条件"
+    <el-drawer title="更多过滤条件"
                :visible.sync="drawerShow"
                size='450px'>
-      <app-form ref="appForm"
-                class="form"
-                style="width: 400px;"
-                :columns='moreOptions'
-                label-width="100px">
-        <template #action>
+      <el-form ref="moreForm"
+               :model='moreParams'
+               label-width="120px">
+        <el-form-item v-for="column in moreOptions"
+                      :key="column.prop"
+                      :label='column.label'
+                      :prop="column.prop">
+          <el-date-picker v-if="column.type === 'daterange'"
+                          v-model="moreParams[column.prop]"
+                          :default-time="['00:00:00', '23:59:59']"
+                          type="daterange"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期"
+                          value-format="timestamp"
+                          :disabled='column.disabled'
+                          :style="column.style">
+          </el-date-picker>
+          <el-date-picker v-else-if="column.type === 'date'"
+                          v-model="moreParams[column.prop]"
+                          type="date"
+                          :placeholder="column.placeholder || '请选择日期'"
+                          value-format="timestamp"
+                          :disabled='column.disabled'
+                          :style="column.style">
+          </el-date-picker>
+          <el-select v-else-if="column.type === 'select'"
+                     v-model="moreParams[column.prop]"
+                     :placeholder="column.placeholder || '请选择'"
+                     :clearable='column.clearable'
+                     :disabled='column.disabled'
+                     :style="column.style">
+            <el-option v-for="item in returnOptions(column.options)"
+                       :key="item.value"
+                       :label='item.label'
+                       :value='item.value'></el-option>
+          </el-select>
+          <el-input v-else
+                    v-model="moreParams[column.prop]"
+                    :disabled='column.disabled'
+                    :placeholder="column.placeholder || '请输入'"
+                    :style="column.style"></el-input>
+        </el-form-item>
+        <el-form-item>
           <div class="action">
             <el-button type='primary'
                        icon="el-icon-search"
                        @click="clickSearch">查询</el-button>
           </div>
-        </template>
-      </app-form>
+        </el-form-item>
+      </el-form>
     </el-drawer>
   </div>
 </template>
@@ -93,7 +129,8 @@ export default {
   data () {
     return {
       drawerShow: false,
-      queryParams: {}
+      queryParams: {},
+      moreParams: {}
     };
   },
   computed: {
@@ -103,6 +140,8 @@ export default {
     moreOptions () {
       return this.options.more || [];
     }
+  },
+  watch: {
   },
 
   created () {
@@ -124,6 +163,19 @@ export default {
           this.setForm(column.prop, defaultValue || '');
         }
       });
+      this.moreOptions.forEach(column => {
+        const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
+        const valueIsArray = ['daterange'];
+        if (valueIsArray.includes(column.type)) {
+          this.setMoreForm(column.prop, defaultValue || []);
+        }
+        else if (column.type === 'switch') {
+          this.setMoreForm(column.prop, defaultValue || false);
+        }
+        else {
+          this.setMoreForm(column.prop, defaultValue || '');
+        }
+      });
     },
     setForm (key, value, column) {
       this.$set(this.queryParams, key, value);
@@ -131,25 +183,20 @@ export default {
         column.change(value);
       }
     },
-    setMoreForm (key, value) {
-      if (this.moreOptions.length) {
-        this.$refs.appForm.setForm(key, value);
+    setMoreForm (key, value, column) {
+      this.$set(this.moreParams, key, value);
+      if (column && column.change) {
+        column.change(value);
       }
     },
     resetForm () {
       this.$refs.form.resetFields();
-      if (this.moreOptions.length) {
-        this.$refs.appForm.resetForm();
-      }
+      this.$refs.moreForm.resetFields();
     },
     getParams () {
-      let moreParams = {};
-      if (this.$refs.appForm) {
-        moreParams = this.$refs.appForm.getParams();
-      }
       const params = {
         ...this.queryParams,
-        ...moreParams
+        ...this.moreParams
       };
       return Object.assign({}, params);
     },
