@@ -10,8 +10,8 @@
                         v-model="queryParams[column.prop]"
                         :default-time="['00:00:00', '23:59:59']"
                         type="daterange"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
+                        :start-placeholder="daterangePlaceholder(column.placeholder,'开始日期',0)"
+                        :end-placeholder="daterangePlaceholder(column.placeholder,'结束日期',1)"
                         value-format="timestamp"
                         :disabled='column.disabled'
                         :style="column.style">
@@ -183,6 +183,15 @@ export default {
           this.setMoreForm(column.prop, defaultValue || '');
         }
       });
+    },
+    daterangePlaceholder (placeholder, defaultPlaceholder, index = 0) {
+      if (placeholder) {
+        const array = placeholder.split('|');
+        return array[index];
+      }
+      else {
+        return defaultPlaceholder;
+      }
     },
     setForm (key, value, column) {
       this.$set(this.queryParams, key, value);
