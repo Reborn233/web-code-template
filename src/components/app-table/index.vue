@@ -1,6 +1,6 @@
 <script>
 import AppPagination from '@/components/app-pagination';
-import tableHeadSetting from './table-head-setting';
+import dropdownSetting from './dropdown-setting';
 import { MyStorage } from '@/utils/storage';
 import { Util } from '@/utils/common';
 function save (key, data) {
@@ -12,7 +12,7 @@ function fetch (key) {
 };
 export default {
   name: 'app-table',
-  components: { AppPagination, tableHeadSetting },
+  components: { AppPagination, dropdownSetting },
   props: {
     // 表格数据
     data: {
@@ -50,35 +50,22 @@ export default {
   data () {
     return {
       tableHeadVisible: false,
-      originColumns: Util.deepClone(this.columns),
-      newColumns: Util.deepClone(this.columns),
+      newColumns: this.columns,
       sortList: []
     };
   },
   computed: {
+    sortColumns () {
+      const columns = Util.deepClone(this.newColumns);
+      return this.sortList.length ? columns.map(item => {
+        item.hidden = this.sortList.indexOf(item.label) === -1;
+        return item;
+      }) : columns;
+    }
   },
   watch: {
-    sortList (val) {
-      if (val.length) {
-        this.newColumns.forEach(item => {
-          if (val.indexOf(item.label) !== -1) {
-            item.hidden = false;
-          }
-          else {
-            item.hidden = true;
-          }
-        });
-        this.newColumns.sort((a, b) => {
-          return val.indexOf(a.label) - val.indexOf(b.label);
-        });
-      }
-      else {
-        this.newColumns = this.originColumns;
-      }
-      // this.$forceUpdate();
-    },
     columns (val) {
-      this.newColumns = Util.deepClone(val);
+      this.newColumns = val;
     }
   },
   created () {
@@ -134,7 +121,7 @@ export default {
           }
         };
       };
-      const columns = this.newColumns.filter(f => !f.hidden);
+      const columns = this.sortList.length ? this.sortColumns.filter(f => !f.hidden) : this.newColumns.filter(f => !f.hidden);
       return columns.map(item => {
         const data = {
           props: {
@@ -167,44 +154,36 @@ export default {
         pageSize={pageSize}
         totalCount={totalCount}></app-pagination>;
     },
-    renderFilter () {
+    renderDropdown () {
       const data = {
         props: {
-          dialogVisible: this.tableHeadVisible,
-          tableHead: this.newColumns
+          options: this.sortColumns
         },
         on: {
-          'update:dialogVisible': (val) => {
-            this.tableHeadVisible = val;
-          },
           'change': (list) => {
             this.sortList = list.filter(l => !l.hidden).map(item => item.label);
             save(this.columnRef, this.sortList);
           },
           'reset': () => {
             this.sortList = [];
-            save(this.columnRef, this.sortList);
+            save(this.columnRef, []);
           }
         }
       };
-      return <el-row>
-        <el-row type="flex" justify="end">
-          <el-button type="text" class='column-filter-btn' icon="el-icon-s-operation"
-            onClick={() => (this.tableHeadVisible = true)}>列筛选排序</el-button>
-        </el-row>
-        <table-head-setting {...data}></table-head-setting>
+      return <el-row type="flex" justify="end">
+        <dropdown-setting {...data}></dropdown-setting>
       </el-row>;
     },
     renderActions () {
       return <el-row type="flex" justify='space-between' class='app-table_actions'>
-        <el-row type="flex">
+        <el-row type="flex" style='align-items: center;'>
           {this.actions.map(action => {
             const onClick = action.onClick || Util.noop;
             return <el-button type="text" icon={action.icon} onClick={onClick}>{action.label}</el-button>;
           })}
           {this.$scopedSlots.head && this.$scopedSlots.head()}
         </el-row>
-        {this.isColumnFilter ? this.renderFilter() : ''}
+        {this.isColumnFilter ? this.renderDropdown() : ''}
       </el-row>;
     }
   }
