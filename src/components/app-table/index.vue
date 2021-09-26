@@ -96,14 +96,15 @@ export default {
         },
         on: { ...this.$listeners }
       };
+      const columns = this.sortList.length ? this.sortColumns.filter(f => !f.hidden) : this.newColumns.filter(f => !f.hidden);
       return <el-table {...tableProps} >
         {this.selection ? <el-table-column type="selection"
           selectable={this.selectable}>
         </el-table-column> : ''}
-        {this.renderTableColum()}
+        {this.renderTableColum(columns)}
       </el-table>;
     },
-    renderTableColum () {
+    renderTableColum (columns) {
       const scopedSlots = (item) => {
         return {
           default: (scope) => {
@@ -121,7 +122,6 @@ export default {
           }
         };
       };
-      const columns = this.sortList.length ? this.sortColumns.filter(f => !f.hidden) : this.newColumns.filter(f => !f.hidden);
       return columns.map(item => {
         const data = {
           props: {
@@ -175,10 +175,25 @@ export default {
       </el-row>;
     },
     renderActions () {
+      const filebutton = action => {
+        return {
+          attrs: {
+            type: 'text'
+          },
+          on: {
+            'selected': (file) => {
+              action.onClick && action.onClick(file);
+            }
+          }
+        };
+      };
       return <el-row type="flex" justify='space-between' class='app-table_actions'>
         <el-row type="flex" style='align-items: center;'>
-          {this.actions.map(action => {
+          {this.actions.filter(item => !item.hidden).map(action => {
             const onClick = action.onClick || Util.noop;
+            if (action.type === 'file') {
+              return <file-button {...filebutton(action)} icon={action.icon} style='margin-left:10px;'>{action.label}</file-button>;
+            }
             return <el-button type="text" icon={action.icon} onClick={onClick}>{action.label}</el-button>;
           })}
           {this.$scopedSlots.head && this.$scopedSlots.head()}
