@@ -3,7 +3,7 @@
     <div class="item"
          :class="isEmpty(value)?'active':''">
       <el-checkbox :value="isEmpty(value)"
-                   @change="$emit('input',[])">全部</el-checkbox>
+                   @change="selected = []">全部</el-checkbox>
     </div>
     <div class="item"
          :class="checked(item.value)?'active':''"
@@ -29,6 +29,11 @@ export default {
       }
     }
   },
+  watch: {
+    selected (val) {
+      this.$emit('input', val);
+    }
+  },
   data () {
     return {
       selected: []
@@ -43,7 +48,6 @@ export default {
       else {
         this.selected.push(value);
       }
-      this.$emit('input', this.selected);
     },
     isEmpty (value) {
       return value.length === 0;
