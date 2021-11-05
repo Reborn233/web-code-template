@@ -51,7 +51,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app');
 
-// 禁止浏览器后退
-// window.addEventListener('popstate', function () {
-//   history.pushState(null, null, document.URL);
-// });
+// 测试
