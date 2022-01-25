@@ -23,14 +23,15 @@ export default {
     },
     gutter: {
       type: Number,
-      default: 20
+      default: 0
     }
   },
 
   data () {
     return {
       showMore: false,
-      queryParams: {}
+      queryParams: {},
+      originParams: {}
     };
   },
   computed: {
@@ -43,8 +44,6 @@ export default {
     hasMore () {
       return this.moreOptions.length > 0;
     }
-  },
-  watch: {
   },
 
   created () {
@@ -64,6 +63,9 @@ export default {
         else if (['checkbox'].includes(column.type)) {
           this.setForm(column.prop, defaultValue || []);
         }
+        else if (column.type === 'select' && column.multiple) {
+          this.setForm(column.prop, defaultValue || []);
+        }
         else {
           this.setForm(column.prop, defaultValue || null);
         }
@@ -72,6 +74,7 @@ export default {
         const defaultValue = Util.isFunction(column.default) ? column.default() : column.default;
         this.setForm(column.prop, defaultValue || null);
       });
+      this.originParams = Util.deepClone(this.queryParams);
     },
     daterangePlaceholder (placeholder, defaultPlaceholder, index = 0) {
       if (placeholder) {
@@ -89,7 +92,8 @@ export default {
       }
     },
     resetForm () {
-      this.$refs.form.resetFields();
+      // this.$refs.form.resetFields();
+      this.queryParams = Util.deepClone(this.originParams);
       this.$emit('reset');
     },
     getParams () {
@@ -122,7 +126,7 @@ export default {
       const key = column.prop;
       const options = this.returnOptions(column.options);
       return <el-form-item label={column.label} prop={key} labelWidth={column.labelWidth}>
-        <el-select {...prop} clearable value={this.queryParams[column.prop]} onInput={(value) => this.setForm(key, value, column)}>
+        <el-select {...prop} clearable value={this.queryParams[key]} onInput={(value) => this.setForm(key, value, column)}>
           {options.map(item => {
             return <el-option key={item.value} label={item.label} value={item.value}></el-option>;
           })}
@@ -140,7 +144,7 @@ export default {
         <el-date-picker {...prop} value={this.queryParams[key]}
           type="date"
           class="datePicker"
-          value-format='timestamp'
+          value-format='yyyy-MM-dd HH:mm:ss'
           placeholder="请选择" onInput={value => this.setForm(key, value, column)} />
       </el-form-item>;
     },
@@ -153,7 +157,7 @@ export default {
               <el-date-picker value={this.queryParams[props[0]]}
                 type="date"
                 class="datePicker"
-                value-format='timestamp'
+                value-format='yyyy-MM-dd HH:mm:ss'
                 placeholder="请选择" onInput={value => this.setForm(props[0], value, column)} />
             </el-form-item>
           </el-col>
@@ -164,7 +168,7 @@ export default {
               <el-date-picker value={this.queryParams[props[1]]}
                 type="date"
                 class="datePicker"
-                value-format='timestamp'
+                value-format='yyyy-MM-dd 23:59:59'
                 onInput={value => this.setForm(props[1], value, column)}
                 placeholder="请选择" />
             </el-form-item>
@@ -187,17 +191,17 @@ export default {
     renderRadioItem (column) {
       const key = column.prop;
       return <el-form-item label={column.label} prop={key} labelWidth={column.labelWidth}>
-        <app-radio value={this.queryParams[column.prop]} onInput={(value) => this.setForm(key, value, column)} options={this.returnOptions(column.options)}></app-radio>
+        <app-radio value={this.queryParams[key]} onInput={(value) => this.setForm(key, value, column)} options={this.returnOptions(column.options)}></app-radio>
       </el-form-item>;
     },
     renderCheckboxItem (column) {
       const key = column.prop;
       return <el-form-item label={column.label} prop={key} labelWidth={column.labelWidth}>
-        <app-checkbox value={this.queryParams[column.prop]} onInput={(value) => this.setForm(key, value, column)} options={this.returnOptions(column.options)}></app-checkbox>
+        <app-checkbox value={this.queryParams[key]} onInput={(value) => this.setForm(key, value, column)} options={this.returnOptions(column.options)}></app-checkbox>
       </el-form-item>;
     },
     renderAction () {
-      return <div class='action'>
+      return <div class='action' style={{ marginLeft: '60px' }}>
         <el-button onClick={() => this.resetForm()}>重置</el-button>
         <el-button type='primary'
           onClick={() => this.clickSearch()}>查询</el-button>
@@ -215,7 +219,7 @@ export default {
       };
       return <el-row gutter={20} style={styles}>
         {
-          this.moreOptions.map(column => {
+          this.moreOptions.filter(c => !this.returnOptions(c.hidden)).map(column => {
             const col = column.col || 8;
             return <el-col span={col}>
               {this.renderFormItem(column)}
@@ -239,15 +243,15 @@ export default {
         {...props}>
         <el-row gutter={this.gutter}>
           {
-            this.columns.map(column => {
+            this.columns.filter(c => !this.returnOptions(c.hidden)).map(column => {
               const col = column.col || 8;
               return <el-col span={col}>
                 {this.renderFormItem(column)}
               </el-col>;
             })
           }
+          {this.renderAction()}
         </el-row>
-        {this.renderAction()}
         {this.renderMoreItem()}
       </el-form>
     </div>;
@@ -260,9 +264,9 @@ export default {
   margin-bottom: 15px;
 }
 .action {
-  text-align: center;
-  margin-top: 15px;
-  margin-bottom: 12px;
+  // display: inline-block;
+  text-align: right;
+  padding-right: 12px;
 }
 .form {
   /deep/ .el-form-item__label {

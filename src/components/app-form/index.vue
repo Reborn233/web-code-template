@@ -13,6 +13,7 @@ export default {
   watch: {
     data: {
       handler (val) {
+        this.init();
         if (val) {
           this.form = Object.assign({}, val);
         }
@@ -29,29 +30,41 @@ export default {
         options: [],
         type: 'text',
         col: 24,
-        size: 'mini',
         min: 1,
-        max: 10
-      }
+        max: 10,
+        valueFormat: 'yyyy-MM-dd HH:mm:ss',
+        clearable: true
+      },
+      uploadForm: {}
     };
   },
   render () {
-    const props = {
+    const _attrs = this.$attrs;
+    const RowProps = {
+      props: {
+        gutter: _attrs.gutter
+      }
+    };
+    const FormProps = {
       attrs: {
-        model: this.form,
-        ...this.$attrs
+        model: this.form
       },
       props: {
-        ...this.$props
+        rules: _attrs.rules,
+        labelWidth: _attrs['label-width'],
+        labelSuffix: _attrs['label-suffix'],
+        size: _attrs.size,
+        disabled: _attrs.disabled
       },
       style: {
         width: '100%'
       },
       on: { ...this.$listeners }
     };
-    return <el-row {...props}>
-      <el-form ref={'appForm'} {...props}>
-        {this.columns.filter(c => !c.hidden).map(column => this.renderFormItem(column))}
+    const filterColumns = this.columns.filter(c => !c.hidden);
+    return <el-row {...RowProps}>
+      <el-form ref={'appForm'} {...FormProps}>
+        {filterColumns.map(column => this.renderFormItem(column))}
         <el-col span={24}>
           <el-form-item>
             {this.$scopedSlots.action && this.$scopedSlots.action()}
@@ -61,9 +74,6 @@ export default {
     </el-row>;
   },
   created () {
-    if (this.isEmptyObject(this.data)) {
-      this.init();
-    }
   },
 
   methods: {
@@ -87,6 +97,9 @@ export default {
               this.setForm(column.prop, defaultValue || 0);
             }
           }
+          else if (column.type === 'upload') {
+            this.$set(this.uploadForm, column.prop, { name: defaultValue });
+          }
           else {
             this.setForm(column.prop, defaultValue || '');
           }
@@ -101,6 +114,7 @@ export default {
       if (column && column.change) {
         column.change(value);
       }
+      this.$forceUpdate();
     },
     getParams () {
       return Object.assign({}, this.form);
@@ -134,19 +148,27 @@ export default {
         rate: this.renderRateItem
       };
       const assginColumn = Object.assign({}, this.defaultColumn, column);
-      const prop = {
-        attrs: {
-          ...assginColumn,
+      const FormItemProps = {
+        props: {
+          prop: assginColumn.prop,
+          label: assginColumn.label,
+          labelWidth: assginColumn.labelWidth,
+          required: assginColumn.required,
+          rules: assginColumn.rules,
+          showMessage: assginColumn.showMessage,
+          inlineMessage: assginColumn.inlineMessage,
+          size: assginColumn.size,
           disabled: Util.isFunction(assginColumn.disabled) ? assginColumn.disabled() : assginColumn.disabled
         }
       };
-      const formItemProp = {
-        labelWidth: prop.labelWidth,
-        rules: prop.rules
-      };
-      if (column.render) {
+      if (column.type === 'slot') {
         return <el-col span={column.col}>
-          <el-form-item {...formItemProp} label={assginColumn.label} prop={assginColumn.prop}>
+          {column.render()}
+        </el-col>;
+      }
+      else if (column.render) {
+        return <el-col span={column.col}>
+          <el-form-item {...FormItemProps}>
             {column.render()}
           </el-form-item>
         </el-col>;
@@ -154,118 +176,307 @@ export default {
       else {
         const render = map[assginColumn.type] || noop;
         return <el-col span={column.col}>
-          <el-form-item {...formItemProp} label={assginColumn.label} prop={assginColumn.prop}>
-            {render(assginColumn, prop)}
+          <el-form-item {...FormItemProps}>
+            {render(assginColumn)}
           </el-form-item>
         </el-col>;
       }
     },
-    renderTextItem (column, props) {
+    renderTextItem (column) {
+      const InputTextProps = {
+        attrs: {
+          maxlength: column.maxlength,
+          minlength: column.minlength,
+          placeholder: column.placeholder,
+          clearable: column.clearable,
+          showPassword: column.showPassword,
+          prefixIcon: column.prefixIcon,
+          suffixIcon: column.suffixIcon,
+          autocomplete: column.autocomplete,
+          name: column.name,
+          readonly: column.readonly,
+          label: column.label,
+          disabled: column.disabled,
+          type: column.type
+        }
+      };
       const onClickRight = column.onClickRight || Util.noop;
-      return <el-input value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+      return <el-input value={this.form[column.prop]} {...InputTextProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
         <template slot="suffix">
-          <i class={`el-input__icon ${column.rightIcon} cursor-pointer`} onClick={onClickRight}></i>
+          {column.renderSuffix ? column.renderSuffix() : <i class={`el-input__icon ${column.rightIcon} cursor-pointer`} onClick={onClickRight}></i>}
         </template>
       </el-input>;
     },
-    renderSelectItem (column, props) {
+    renderSelectItem (column) {
+      const InputSelectProps = {
+        attrs: {
+          multiple: column.multiple,
+          disabled: column.disabled,
+          placeholder: column.placeholder,
+          clearable: column.clearable,
+          collapseTags: column.collapseTags,
+          multipleLimit: column.multipleLimit,
+          name: column.name,
+          readonly: column.readonly,
+          label: column.label,
+          filterable: column.filterable
+        }
+      };
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-select value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
-        {options.map(o => {
-          return <el-option label={o.label} value={o.value}></el-option>;
-        })}
-      </el-select>;
+      return <div>
+        <el-select value={this.form[column.prop]} {...InputSelectProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+          {options.map(o => {
+            return <el-option label={o.label} value={o.value} disabled={o.disabled}></el-option>;
+          })}
+        </el-select>
+        {column.renderRight && column.renderRight()}
+      </div>;
     },
-    renderDateRangeItem (column, props) {
+    renderDateRangeItem (column) {
+      const DateRangeProps = {
+        attrs: {
+          readonly: column.readonly,
+          disabled: column.disabled,
+          editable: column.editable,
+          clearable: column.clearable,
+          rangeSeparator: column.rangeSeparator,
+          defaultValue: column.defaultValue,
+          valueFormat: column.valueFormat,
+          name: column.name
+        }
+      };
       return <el-date-picker
-        {...props}
         value={this.form[column.prop]}
         default-time={['00:00:00', '23:59:59']}
         type="daterange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        value-format="timestamp" onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+        {...DateRangeProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
       </el-date-picker>;
     },
-    renderDateItem (column, props) {
+    renderDateItem (column) {
+      const DateProps = {
+        attrs: {
+          readonly: column.readonly,
+          disabled: column.disabled,
+          editable: column.editable,
+          clearable: column.clearable,
+          pickerOptions: column.pickerOptions,
+          defaultValue: column.defaultValue,
+          valueFormat: column.valueFormat,
+          name: column.name,
+          placeholder: column.placeholder
+        }
+      };
       return <el-date-picker
-        {...props}
-        value={this.form[column.prop]}
         type="date"
+        value={this.form[column.prop]}
+        {...DateProps}
         onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
       </el-date-picker>;
     },
-    renderTimeItem (column, props) {
+    renderTimeItem (column) {
+      const TimeProps = {
+        attrs: {
+          readonly: column.readonly,
+          disabled: column.disabled,
+          editable: column.editable,
+          clearable: column.clearable,
+          pickerOptions: column.pickerOptions,
+          defaultValue: column.defaultValue,
+          valueFormat: column.valueFormat,
+          name: column.name,
+          placeholder: column.placeholder
+        }
+      };
       return <el-time-select
         value={this.form[column.prop]}
         onInput={(value) => this.setForm(column.prop, value, column)}
-        {...props}
+        {...TimeProps}
         picker-options={column.pickerOptions} style={column.style}>
       </el-time-select>;
     },
-    renderSwitchItem (column, props) {
+    renderSwitchItem (column) {
+      const SwitchProps = {
+        attrs: {
+          disabled: column.disabled,
+          width: column.width,
+          activeText: column.activeText,
+          inactiveText: column.inactiveText,
+          activeValue: column.activeValue,
+          inactiveValue: column.inactiveValue,
+          activeColor: column.activeColor,
+          inactiveColor: column.inactiveColor,
+          name: column.name
+        }
+      };
       return <el-switch value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-switch>;
+        {...SwitchProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-switch>;
     },
-    renderCheckboxItem (column, props) {
+    renderCheckboxItem (column) {
+      const CheckboxProps = {
+        attrs: {
+          disabled: column.disabled,
+          label: column.label,
+          trueLabel: column.trueLabel,
+          falseLabel: column.falseLabel,
+          border: column.border,
+          name: column.name,
+          checked: column.checked
+        }
+      };
       const options = Util.isFunction(column.options) ? column.options() : column.options;
-      return <el-checkbox-group value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+      return <el-checkbox-group value={this.form[column.prop]} onInput={(value) => this.setForm(column.prop, value, column)}
+        {...CheckboxProps} style={column.style}>
         {options.map(o => {
           return <el-checkbox label={o.value} disabled={o.disabled} name={o.label}>{o.label}</el-checkbox>;
         })}
       </el-checkbox-group>;
     },
-    renderRadioItem (column, props) {
+    renderRadioItem (column) {
+      const RadioProps = {
+        attrs: {
+          disabled: column.disabled,
+          textColor: column.textColor,
+          label: column.label,
+          border: column.border,
+          name: column.name,
+          checked: column.checked,
+          fill: column.fill
+        }
+      };
       const options = Util.isFunction(column.options) ? column.options() : column.options;
       return <el-radio-group value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+        {...RadioProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
         {options.map(o => {
           return <el-radio label={o.value} disabled={o.disabled}>{o.label}</el-radio>;
         })}
       </el-radio-group>;
     },
-    renderTextareaItem (column, props) {
+    renderTextareaItem (column) {
+      const InputTextareaProps = {
+        attrs: {
+          maxlength: column.maxlength,
+          minlength: column.minlength,
+          placeholder: column.placeholder,
+          clearable: column.clearable,
+          showPassword: column.showPassword,
+          prefixIcon: column.prefixIcon,
+          suffixIcon: column.suffixIcon,
+          autocomplete: column.autocomplete,
+          name: column.name,
+          readonly: column.readonly,
+          label: column.label,
+          showWordLimit: column.showWordLimit,
+          rows: column.rows
+        }
+      };
       return <el-input type="textarea" value={this.form[column.prop]}
-        {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input>;
+        {...InputTextareaProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input>;
     },
     renderUploadItem (column) {
-      const prop = {
+      const UploadProps = {
         on: {
           selected: (file) => {
-            this.setForm(column.prop, file, column);
+            if (column.prop) {
+              this.$set(this.uploadForm, column.prop, file);
+              column.change && column.change(file);
+            }
           }
         }
       };
-      return <div class='app-form__upload' style={column.style}>
-        <file-button accept={column.accept} {...prop} disabled={column.disabled}>选择文件</file-button>
-        {this.form[column.prop] ? <div class='el-upload-list__item-name'>
-          <i class='el-icon-document'></i>
-          {this.form[column.prop].name}
-        </div> : ''}
+      return <div>
+        <div class='app-form__upload' style={column.style}>
+          <file-button accept={column.accept} {...UploadProps} disabled={column.disabled}>选择文件</file-button>
+          {this.uploadForm[column.prop] ? <div class='el-upload-list__item-name'>
+            {this.uploadForm[column.prop].name ? <i class='el-icon-document'></i> : ''}
+            {this.uploadForm[column.prop].name}
+          </div> : ''}
+          {column.renderRight && column.renderRight()}
+        </div>
+        <div class='tips'>{column.desc}</div>
       </div>;
     },
-    renderInputNumberItem (column, props) {
-      return <el-input-number value={this.form[column.prop]} {...props} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input-number>;
+    renderInputNumberItem (column) {
+      const InputNumberProps = {
+        attrs: {
+          max: column.max,
+          min: column.min,
+          placeholder: column.placeholder,
+          step: column.step,
+          stepStrictly: column.stepStrictly,
+          name: column.name,
+          precision: column.precision,
+          label: column.label,
+          controls: column.controls,
+          controlsSosition: column.controlsSosition,
+          disabled: column.disabled
+        }
+      };
+      return <el-input-number value={this.form[column.prop]} {...InputNumberProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}></el-input-number>;
     },
-    renderCascaderItem (column, props) {
+    renderCascaderItem (column) {
       const scopedSlots = {
         default: (scope) => {
           return column.slot(scope);
         }
       };
+      const CascaderProps = {
+        attrs: {
+          options: column.options,
+          disabled: column.disabled,
+          placeholder: column.placeholder,
+          clearable: column.clearable,
+          showAllLevels: column.showAllLevels,
+          collapseTags: column.collapseTags,
+          separator: column.separator,
+          filterable: column.filterable
+        }
+      };
       return <el-cascader
         value={this.form[column.prop]}
         onInput={(value) => this.setForm(column.prop, value, column)}
-        {...props} scopedSlots={scopedSlots} style={column.style}></el-cascader>;
+        {...CascaderProps} scopedSlots={scopedSlots} style={column.style}></el-cascader>;
     },
-    renderSliderItem (column, props) {
+    renderSliderItem (column) {
+      const SliderProps = {
+        attrs: {
+          min: column.min,
+          max: column.max,
+          disabled: column.disabled,
+          step: column.step,
+          showStops: column.showStops,
+          showTooltip: column.showTooltip,
+          range: column.range,
+          vertical: column.vertical,
+          height: column.height,
+          label: column.label,
+          marks: column.marks
+        }
+      };
       return <el-slider value={this.form[column.prop]}
-        onInput={(value) => this.setForm(column.prop, value, column)} {...props} style={column.style}></el-slider>;
+        onInput={(value) => this.setForm(column.prop, value, column)} {...SliderProps} style={column.style}></el-slider>;
     },
-    renderRateItem (column, props) {
+    renderRateItem (column) {
+      const RateProps = {
+        attrs: {
+          max: column.max,
+          disabled: column.disabled,
+          allowHalf: column.allowHalf,
+          lowThreshold: column.lowThreshold,
+          highThreshold: column.highThreshold,
+          colors: column.colors,
+          voidColor: column.voidColor,
+          disabledVoidColor: column.disabledVoidColor,
+          showText: column.showText,
+          showScore: column.showScore,
+          textColor: column.textColor,
+          texts: column.texts,
+          scoreTemplate: column.scoreTemplate
+        }
+      };
       return <el-rate value={this.form[column.prop]}
-        onInput={(value) => this.setForm(column.prop, value, column)} {...props} style={column.style}></el-rate>;
+        onInput={(value) => this.setForm(column.prop, value, column)} {...RateProps} style={column.style}></el-rate>;
     }
   }
 };

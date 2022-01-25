@@ -86,6 +86,9 @@ export default {
     },
     renderTable () {
       const tableProps = {
+        attrs: {
+          ...this.$attrs
+        },
         props: {
           border: true,
           data: this.data,
@@ -117,7 +120,7 @@ export default {
               return scope.$index + 1;
             }
             else {
-              return <span>{value || ''}</span>;
+              return <span>{value}</span>;
             }
           }
         };

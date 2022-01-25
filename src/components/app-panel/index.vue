@@ -1,7 +1,7 @@
 <template>
   <el-dialog :visible.sync="show"
              v-bind="$attrs"
-             top="30px"
+             :top="top"
              :show-close='false'
              :fullscreen='fullscreen'
              v-on="$listeners"
@@ -22,7 +22,7 @@
       </button>
     </template>
     <div v-loading='loading'>
-      <slot></slot>
+      <slot v-if="show"></slot>
       <div class="footer">
         <el-button v-for="(item,index) in options"
                    :key="index"
@@ -52,7 +52,11 @@ export default {
         return [];
       }
     },
-    loading: Boolean
+    loading: Boolean,
+    top: {
+      type: String,
+      default: '30px'
+    }
   },
 
   data () {
