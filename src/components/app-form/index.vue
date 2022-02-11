@@ -114,7 +114,6 @@ export default {
       if (column && column.change) {
         column.change(value);
       }
-      this.$forceUpdate();
     },
     getParams () {
       return Object.assign({}, this.form);
