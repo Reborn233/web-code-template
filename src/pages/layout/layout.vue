@@ -116,7 +116,7 @@ export default {
   &.active {
     > .service-side-bar {
       width: 40px;
-      /deep/ .el-submenu {
+      ::v-deep .el-submenu {
         overflow: hidden;
         & > .el-submenu__title {
           padding-left: 9px !important;
@@ -126,11 +126,11 @@ export default {
         }
       }
 
-      /deep/ .el-tooltip {
+      ::v-deep .el-tooltip {
         padding-left: 9px !important;
       }
 
-      /deep/ .el-menu--collapse {
+      ::v-deep .el-menu--collapse {
         .el-submenu {
           & > .el-submenu__title {
             & > span {

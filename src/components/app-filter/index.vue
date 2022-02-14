@@ -269,11 +269,11 @@ export default {
   padding-right: 12px;
 }
 .form {
-  /deep/ .el-form-item__label {
+  ::v-deep .el-form-item__label {
     font-weight: bold;
   }
-  /deep/ .el-input,
-  /deep/ .el-select {
+  ::v-deep .el-input,
+  ::v-deep .el-select {
     width: 100%;
   }
   .datePicker {

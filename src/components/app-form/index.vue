@@ -485,7 +485,7 @@ export default {
 .app-form__upload {
   display: flex;
 }
-/deep/ .el-date-editor.el-input,
+::v-deep .el-date-editor.el-input,
 .el-date-editor.el-input__inner {
   width: 100%;
 }

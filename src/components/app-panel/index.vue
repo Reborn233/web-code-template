@@ -83,7 +83,7 @@ export default {
 .el-dialog__fullscreen {
   right: 45px;
 }
-/deep/ .el-dialog__headerbtn {
+::v-deep .el-dialog__headerbtn {
   color: #fff;
   > i {
     font-weight: 700;
