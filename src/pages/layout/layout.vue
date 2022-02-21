@@ -1,16 +1,19 @@
 <template>
   <div class="service-layout-wrapper clearfix">
-    <div class="service-side-bar">
+    <div v-if="showSidebar"
+         class="service-side-bar">
       <sidebar></sidebar>
     </div>
     <div class="service-main-container">
-      <div class="app-breadcrumb"
-           v-if="showBreadcrumbWhenServiceHome">
-        <img src="../../assets/images/breadcrumb.jpg"
-             style="height:35%; margin: auto 0;">
-        <app-bread-crumb :data="breadCrumbs"></app-bread-crumb>
+      <div class="service-main-header">
+        <div class="app-breadcrumb"
+             v-if="showBreadcrumbWhenServiceHome">
+          <img src="../../assets/images/breadcrumb.jpg"
+               class="breadcrumb-image">
+          <app-bread-crumb :data="breadCrumbs"></app-bread-crumb>
+        </div>
+        <tags-view></tags-view>
       </div>
-      <tags-view></tags-view>
       <div class="service-view-container">
         <transition name="fade"
                     mode="out-in">
@@ -46,7 +49,8 @@ export default {
     return {
       breadCrumbs: [],
       // 服务首页是否显示面包屑
-      showBreadcrumbWhenServiceHome: ''
+      showBreadcrumbWhenServiceHome: '',
+      showSidebar: true
     };
   },
   methods: {
@@ -69,13 +73,19 @@ export default {
       this.breadCrumbs = _breads;
     }
   },
-  // 用来做面包屑
-  beforeRouteUpdate (to, from, next) {
-    this.buildBreadCrumb(to.matched);
-    next();
+  watch: {
+    $route (to) {
+      this.buildBreadCrumb(to.matched);
+    }
   },
+  // 用来做面包屑
+  // beforeRouteUpdate (to, from, next) {
+  //   this.buildBreadCrumb(to.matched);
+  //   next();
+  // },
   created () {
     this.buildBreadCrumb(this.$route.matched);
+    this.showSidebar = !window.sessionStorage.getItem('HIDE_SIDEBAR');
     // 默认跳转到当前激活路由
     // 注释此代码：当菜单存在查询参数、动态路由时保证参数存在
     // this.$router.push({ name: this.vx_gt_GetActiveMenu });
@@ -105,21 +115,27 @@ export default {
     width: calc(100% - 200px);
     height: $percent-100;
     background-color: #e5ecef;
-    // padding: 0 20px;
     overflow: auto;
-
-    > .app-breadcrumb {
-      width: 100%;
-      height: 40px;
-      background-color: #ffffff;
-      display: flex;
-      flex-direction: row;
-      padding-left: 20px;
+    position: relative;
+    .service-main-header {
+      .app-breadcrumb {
+        width: 100%;
+        height: 40px;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        .breadcrumb-image {
+          height: 14px;
+          margin-right: 8px;
+        }
+      }
     }
     > .service-view-container {
       background-color: #e5ecef;
+      overflow: hidden;
       padding: 15px;
-      height: calc(100% - 40px);
+      // height: calc(100% - 74px);
     }
   }
 
