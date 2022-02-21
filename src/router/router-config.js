@@ -22,7 +22,14 @@ export default [
       ...routers
     ]
   },
-
+  {
+    path: '/redirect/:fullPath',
+    name: 'redirect',
+    component: _import('layout/redirect'),
+    meta: {
+      isWhiteList: true
+    }
+  },
   {
     path: '/index',
     name: 'index',

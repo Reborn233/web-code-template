@@ -4,6 +4,7 @@ import sidebar from './modules/sidebar';
 import user from './modules/user';
 import Comm from './modules/communication-child';
 import CachedView from './modules/cached-view';
+import TagsView from './modules/tags-view';
 
 Vue.use(Vuex);
 
@@ -12,7 +13,8 @@ const store = new Vuex.Store({
     sidebar,
     user,
     Comm,
-    CachedView
+    CachedView,
+    TagsView
   }
 });
 

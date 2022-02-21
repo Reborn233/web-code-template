@@ -30,7 +30,18 @@ export default {
     ...mapActions(['vx_ac_SetActiveMenu']),
     setCurrentMenu (name) {
       this.vx_ac_SetActiveMenu({ menu: name });
-      this.$router.push({ name: name });
+      if (name === this.$route.name) {
+        this.$router.replace({
+          name: 'redirect',
+          params: {
+            fullPath: this.$route.fullPath
+          }
+        });
+        return;
+      }
+      this.$router.push({
+        name: name
+      });
     }
   }
 };

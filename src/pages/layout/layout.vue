@@ -10,10 +10,13 @@
              style="height:35%; margin: auto 0;">
         <app-bread-crumb :data="breadCrumbs"></app-bread-crumb>
       </div>
+      <tags-view></tags-view>
       <div class="service-view-container">
         <transition name="fade"
                     mode="out-in">
-          <router-view></router-view>
+          <keep-alive :include="cachedViews">
+            <router-view :key="key"></router-view>
+          </keep-alive>
         </transition>
       </div>
     </div>
@@ -25,12 +28,19 @@ import { Util } from '@/utils/common';
 import { mapGetters, mapActions } from 'vuex';
 import Sidebar from './components/sidebar/sidebar';
 import AppBreadCrumb from '@/components/app-breadcrumb';
+import tagsView from './tags-view';
 
 export default {
   name: 'ServiceLayout',
-  components: { Sidebar, AppBreadCrumb },
+  components: { Sidebar, AppBreadCrumb, tagsView },
   computed: {
-    ...mapGetters(['vx_gt_GetActiveMenu'])
+    ...mapGetters(['vx_gt_GetActiveMenu']),
+    key () {
+      return this.$route.fullPath;
+    },
+    cachedViews () {
+      return this.$store.state.TagsView.cachedViews;
+    }
   },
   data () {
     return {
