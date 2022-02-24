@@ -17,6 +17,8 @@
     <ul class='contextmenu'
         v-show="visible"
         :style="{left:left+'px',top:top+'px'}">
+      <li v-show="showRefreshSelectedTag"
+          @click="refreshSelectedTag(selectedTag)">刷新页面</li>
       <li @click="closeSelectedTag(selectedTag)">关闭</li>
       <li @click="closeOthersTags">关闭其他</li>
       <li @click="closeAllTags">关闭所有</li>
@@ -41,6 +43,9 @@ export default {
   computed: {
     visitedViews () {
       return this.$store.state.TagsView.visitedViews;
+    },
+    showRefreshSelectedTag () {
+      return this.$route.name === this.selectedTag.name;
     }
   },
   watch: {
@@ -72,7 +77,7 @@ export default {
     },
     addViewTags () {
       const route = this.generateRoute();
-      if (!route) {
+      if (!route || !route.meta.breadcrumb) {
         return false;
       }
       const _title = this.$t(`navigation.${route.meta.breadcrumb}`);
@@ -88,6 +93,22 @@ export default {
             break;
           }
         }
+      });
+    },
+    refreshSelectedTag (view) {
+      this.$router.replace({
+        name: 'redirect',
+        params: {
+          fullPath: view.path
+        }
+      });
+      this.$notify.success({
+        position: 'bottom-right',
+        showClose: false,
+        duration: 1200,
+        dangerouslyUseHTMLString: true,
+        customClass: 'refresh',
+        message: '<span>页面已刷新</span>'
       });
     },
     closeSelectedTag (view) {
@@ -170,7 +191,7 @@ export default {
   .contextmenu {
     margin: 0;
     background: #fff;
-    z-index: 2;
+    z-index: 9;
     position: absolute;
     list-style-type: none;
     padding: 5px 0;
