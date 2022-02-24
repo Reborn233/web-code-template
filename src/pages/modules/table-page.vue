@@ -52,7 +52,7 @@ const mockData = [{
 }];
 
 export default {
-  name: 'TablePage',
+  name: 'tablePage',
 
   mixins: [PaginationMixin],
 

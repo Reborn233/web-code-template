@@ -2,6 +2,7 @@
   <el-scrollbar style="height: 100%;"
                 class="scrollbar-container">
     <el-menu mode="vertical"
+             :collapse="vx_gt_GetMenuIsCollapse"
              :show-timeout="200"
              :default-active="vx_gt_GetActiveMenu"
              background-color="#fafafa"
@@ -24,7 +25,7 @@ export default {
   name: 'sidebar',
   components: { SidebarItem },
   computed: {
-    ...mapGetters(['vx_gt_GetActiveMenu', 'vx_gt_GetPermissionMenus'])
+    ...mapGetters(['vx_gt_GetActiveMenu', 'vx_gt_GetPermissionMenus', 'vx_gt_GetMenuIsCollapse'])
   },
   methods: {
     ...mapActions(['vx_ac_SetActiveMenu']),

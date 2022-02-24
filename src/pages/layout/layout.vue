@@ -1,15 +1,18 @@
 <template>
   <div class="service-layout-wrapper clearfix">
     <div v-if="showSidebar"
-         class="service-side-bar">
+         class="service-side-bar"
+         :class="{'service-side-bar_collapse':vx_gt_GetMenuIsCollapse}">
       <sidebar></sidebar>
     </div>
-    <div class="service-main-container">
+    <div class="service-main-container"
+         :class="{'service-main-container_collapse':vx_gt_GetMenuIsCollapse}">
       <div class="service-main-header">
         <div class="app-breadcrumb"
              v-if="showBreadcrumbWhenServiceHome">
-          <img src="../../assets/images/breadcrumb.jpg"
-               class="breadcrumb-image">
+          <i :class="[vx_gt_GetMenuIsCollapse?'el-icon-s-unfold':'el-icon-s-fold']"
+             @click="vx_Set_MenuIsCollapse"
+             class="collapse-icon"></i>
           <app-bread-crumb :data="breadCrumbs"></app-bread-crumb>
         </div>
         <tags-view></tags-view>
@@ -37,7 +40,7 @@ export default {
   name: 'ServiceLayout',
   components: { Sidebar, AppBreadCrumb, tagsView },
   computed: {
-    ...mapGetters(['vx_gt_GetActiveMenu']),
+    ...mapGetters(['vx_gt_GetActiveMenu', 'vx_gt_GetMenuIsCollapse']),
     key () {
       return this.$route.fullPath;
     },
@@ -54,7 +57,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['vx_Set_IsShowSwitcher']),
+    ...mapActions(['vx_Set_IsShowSwitcher', 'vx_Set_MenuIsCollapse']),
     buildBreadCrumb (routerMatched) {
       if (!Util.isArray(routerMatched)) return [];
       let _breads = [];
@@ -94,8 +97,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/variables';
-
 .service-layout-wrapper {
   position: relative;
   display: flex;
@@ -109,6 +110,10 @@ export default {
     height: $percent-100;
     transition: width 0.3s;
     background-color: #fafafa;
+
+    &.service-side-bar_collapse {
+      width: 65px;
+    }
   }
 
   > .service-main-container {
@@ -117,6 +122,9 @@ export default {
     background-color: #e5ecef;
     overflow: auto;
     position: relative;
+    &.service-main-container_collapse {
+      width: calc(100% - 65px);
+    }
     .service-main-header {
       .app-breadcrumb {
         width: 100%;
@@ -128,6 +136,11 @@ export default {
         .breadcrumb-image {
           height: 14px;
           margin-right: 8px;
+        }
+        .collapse-icon {
+          cursor: pointer;
+          font-size: 20px;
+          color: #999;
         }
       }
     }
@@ -170,6 +183,12 @@ export default {
         }
       }
     }
+  }
+}
+
+::v-deep .el-menu--collapse {
+  .el-submenu span[slot='title'] {
+    display: none;
   }
 }
 </style>

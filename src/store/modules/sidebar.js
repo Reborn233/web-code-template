@@ -28,7 +28,7 @@ export default {
     menus: null, // 有权限的导航
     permissions: [], // 权限列表
     activeMenu: '', // 当前激活的导航
-    activeService: 'insurance'
+    menuIsCollapse: false
   },
   mutations: {
     SET_PERMISSON_MENUS (state) {
@@ -39,6 +39,9 @@ export default {
     },
     ACTIVE_MENU (state, { menu }) {
       state.activeMenu = menu;
+    },
+    SET_MENUISCOLLAPSE (state) {
+      state.menuIsCollapse = !state.menuIsCollapse;
     }
   },
   getters: {
@@ -51,8 +54,8 @@ export default {
     vx_gt_GetActiveMenu (state) {
       return state.activeMenu;
     },
-    getActiveService (state) {
-      return state.activeService;
+    vx_gt_GetMenuIsCollapse (state) {
+      return state.menuIsCollapse;
     }
   },
   actions: {
@@ -75,6 +78,9 @@ export default {
       commit('SET_PERMISSONS', { permissions: [] });
       commit('ACTIVE_MENU', { menu: INIT_ACTIVE_MENU });
       commit('SET_PERMISSON_MENUS');
+    },
+    vx_Set_MenuIsCollapse ({ commit }) {
+      commit('SET_MENUISCOLLAPSE');
     }
   }
 };
