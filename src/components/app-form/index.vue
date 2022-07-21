@@ -41,7 +41,7 @@ export default {
   render () {
     const _attrs = this.$attrs;
     const RowProps = {
-      props: {
+      attrs: {
         gutter: _attrs.gutter
       }
     };
@@ -135,6 +135,7 @@ export default {
         select: this.renderSelectItem,
         dateRange: this.renderDateRangeItem,
         date: this.renderDateItem,
+        datetime: this.renderDateItem,
         time: this.renderTimeItem,
         switch: this.renderSwitchItem,
         checkbox: this.renderCheckboxItem,
@@ -175,8 +176,9 @@ export default {
       else {
         const render = map[assginColumn.type] || noop;
         return <el-col span={column.col}>
-          <el-form-item {...FormItemProps}>
+          <el-form-item {...FormItemProps} class={assginColumn.renderBottom ? 'el-form-item-bottom-0' : ''} >
             {render(assginColumn)}
+            {assginColumn.renderBottom && assginColumn.renderBottom()}
           </el-form-item>
         </el-col>;
       }
@@ -223,12 +225,11 @@ export default {
       };
       const options = Util.isFunction(column.options) ? column.options() : column.options;
       return <div>
-        <el-select value={this.form[column.prop]} {...InputSelectProps} onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
+        <el-select value={this.form[column.prop]} {...InputSelectProps} onChange={(value) => this.setForm(column.prop, value, column)} style={column.style}>
           {options.map(o => {
             return <el-option label={o.label} value={o.value} disabled={o.disabled}></el-option>;
           })}
         </el-select>
-        {column.renderRight && column.renderRight()}
       </div>;
     },
     renderDateRangeItem (column) {
@@ -263,12 +264,13 @@ export default {
           pickerOptions: column.pickerOptions,
           defaultValue: column.defaultValue,
           valueFormat: column.valueFormat,
+          format: column.format,
           name: column.name,
           placeholder: column.placeholder
         }
       };
       return <el-date-picker
-        type="date"
+        type={column.type}
         value={this.form[column.prop]}
         {...DateProps}
         onInput={(value) => this.setForm(column.prop, value, column)} style={column.style}>
@@ -365,6 +367,7 @@ export default {
           autocomplete: column.autocomplete,
           name: column.name,
           readonly: column.readonly,
+          disabled: column.disabled,
           label: column.label,
           showWordLimit: column.showWordLimit,
           rows: column.rows
@@ -487,6 +490,10 @@ export default {
 }
 ::v-deep .el-date-editor.el-input,
 .el-date-editor.el-input__inner {
+  width: 100%;
+}
+
+::v-deep .el-select {
   width: 100%;
 }
 </style>
