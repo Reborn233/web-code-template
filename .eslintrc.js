@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: ['plugin:vue/essential', '@vue/standard'],
   rules: {
-    'no-console': 2,
+    'no-console': 'off',
     'no-debugger': 2,
     // 语句强制分号结尾
     semi: [2, 'always'],
@@ -17,9 +17,9 @@ module.exports = {
     // 优先使用数组和对象解构
     'prefer-destructuring': 0,
     'no-duplicate-imports': 2,
-    'brace-style': ['error', 'stroustrup', { allowSingleLine: true }],
     'space-before-function-paren': 0,
-    'no-template-curly-in-string': 0
+    'no-template-curly-in-string': 0,
+    'quotes': ['error', 'single', 'avoid-escape']
   },
   parserOptions: {
     parser: 'babel-eslint'

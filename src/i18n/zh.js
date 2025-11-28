@@ -4,6 +4,7 @@ export default {
     tablePage: '表格组件',
     formPage: '表单组件',
     panelPage: '弹窗组件',
-    todo: 'TODO'
+    todo: 'TODO',
+    nav: '组件切换'
   }
 };

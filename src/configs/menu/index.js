@@ -34,5 +34,11 @@ export default [
     desc: 'todo',
     permission: 'ANY',
     iconClass: 'el-icon-s-grid'
+  },
+  {
+    name: 'nav',
+    desc: 'nav',
+    permission: 'ANY',
+    iconClass: 'el-icon-s-grid'
   }
 ];

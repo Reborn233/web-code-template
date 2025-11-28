@@ -50,5 +50,15 @@ export default [
       menuMapper: 'todo',
       breadcrumb: 'todo'
     }
+  },
+  {
+    path: 'nav',
+    name: 'nav',
+    component: _import('modules/nav/index'),
+    meta: {
+      permission: 'ANY',
+      menuMapper: 'nav',
+      breadcrumb: 'nav'
+    }
   }
 ];
